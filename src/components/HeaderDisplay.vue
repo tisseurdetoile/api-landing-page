@@ -3,7 +3,7 @@
   <header
     v-bind:class="{ 'panel-cover--collapsed': displayNews }"
     class="panel-cover"
-    v-bind:style="[backgroundImage]"
+    v-bind:style="[cssBackGround]"
   >
     <div class="panel-main">
       <div class="panel-main__inner panel-inverted">
@@ -53,25 +53,21 @@ export default {
     }
   },
   components: { NavigationIcon },
-  props: ['info', 'activeNews'],
+  props: { info: Object },
   computed: {
-    /**
-     * background: url(../images/background-cover.jpg) top left no-repeat #666;
-     */
-    backgroundImage() {
-      var img_src = 'cover.jpg'
-      if (this.info !== null) {
-        img_src = 'url(' + this.publicPath + this.info.background + ')'
-      }
+    cssBackGround() {
+      var img_src = 'url(' + this.publicPath + this.imageSrc + ')'
       return {
         'background-image': img_src,
         'background-size': 'cover',
       }
     },
-    image() {
-      return (
-        'url(' + this.publicPath + 'cover.jpg' + ') top left no-repeat #666'
-      )
+    imageSrc() {
+      if (this.info !== null) {
+        return this.info.background
+      } else {
+        return 'cover.jpg'
+      }
     },
   },
   methods: {
@@ -79,7 +75,6 @@ export default {
       return window.location.pathname === '/news'
     },
     toggleNews() {
-      console.log('call toggleNews')
       this.displayNews = !this.displayNews
     },
     increment() {
