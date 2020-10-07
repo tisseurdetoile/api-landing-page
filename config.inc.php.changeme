@@ -1,0 +1,29 @@
+<?php declare (strict_types = 1);
+
+return [
+    'debug' => 'true',
+    'maxelement' => 7,
+    'rss' => 'https://www.me.net/feed.xml',
+    'twitter' => [
+        'name' => 'twitterMe',
+        'apiKey' => 'the key',
+        'apiSecretKey' => 'api secret key',
+        'apiAccessToken' => 'api access token',
+        'apiAccessTokenSecret' => 'api access token secret',
+    ],
+    'me' => [
+        'title' => 'title',
+        'subtitle' => 'subtitle',
+        'url' => 'url',
+        'background' => 'background',
+        'icon' => 'icon',
+        'social' => [
+            'twitter' => '@twitterMe',
+            'linkedin' => 'linkedinMe',
+            'facebook' => 'facebookMe',
+            'mail' => 'mailMe',
+            'github' => 'githubMe',
+            'rss' => 'rssMe',
+        ],
+    ],
+];
