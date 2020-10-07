@@ -1,0 +1,16 @@
+{
+  "title": "This is a title",
+  "subtitle": "This is a subtitle",
+  "url": "https://www.website.net/",
+  "background": "./cover_alt_00.jpg",
+  "backgrounds": {
+    "cycle": ["cover_alt_00.jpg", "cover_alt_01.jpg", "cover_alt_02.jpg"]
+  },
+  "icon": "icon.png",
+  "social": {
+    "twitter": "@twitter",
+    "mail": "contact@mock.me",
+    "github": "github",
+    "rss": "https: //rss.website.net/feed.xml"
+  }
+}
