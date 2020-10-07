@@ -25,6 +25,6 @@ import TSDateDisplay from './TSDateDisplay'
 export default {
   name: 'PostTwitterDisplay',
   components: { TSDateDisplay },
-  props: ['post'],
+  props: { post: Object },
 }
 </script>

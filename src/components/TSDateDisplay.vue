@@ -6,7 +6,7 @@
 <script>
 export default {
   name: 'TSDateDisplay',
-  props: ['timestamp'],
+  props: { timestamp: String },
   methods: {
     format_date_FR(ts) {
       const milliseconds = ts * 1000
