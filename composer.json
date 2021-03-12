@@ -3,5 +3,9 @@
     "leafs/leaf": "^2.3",
     "abraham/twitteroauth": "^1.2",
     "dg/rss-php": "^1.4"
-  }
+  },
+  "config": {
+    "platform": {
+      "php": "7.4.16"
+    }
 }
