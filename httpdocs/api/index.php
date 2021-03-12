@@ -26,7 +26,6 @@ $app = new Leaf\App;
 
 $db = new SQLite3('landing_page.sqlite');
 
-$app->setBasePath('/api');
 $app->config($config);
 
 $app->get('/', function () use ($app) {
