@@ -3,8 +3,8 @@ error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
 // import composer's autoloader
-require_once "../../vendor/autoload.php";
-$config = require_once "../../config.inc.php";
+require_once "../vendor/autoload.php";
+$config = require_once "./config.inc.php";
 
 /**
  * normalise les textes pour serialisation
@@ -13,7 +13,7 @@ function normalize($text)
 {
     $striped = trim(preg_replace('/\s\s+/', ' ', $text));
     $striped = strtr($striped, array_flip(get_html_translation_table(HTML_ENTITIES, ENT_NOQUOTES)));
-    $striped = preg_replace('/\s+?(\S+)?$/', '', substr($striped, 0, 181));
+    $striped = preg_replace('/\s+?(\S+)?$/', '', substr($striped, 0, 255));
     $striped = str_replace("'", "’", $striped);
 
     return $striped;
@@ -139,6 +139,7 @@ $app->get('/fetch', function () use ($app) {
     $twitterConfig = $app->config('twitter');
     $twitter_to_db = 0;
     $twitter_error = 0;
+    $twitter_fetch_error = 0;
     $twitter_found = 0;
 
     $twitter_result = [];
@@ -153,42 +154,46 @@ $app->get('/fetch', function () use ($app) {
 
     $shaUrl = hash('sha256', $twitterConfig['name']);
 
-    foreach ($statuses as $status_item) {
-        $type = 'twitter';
-        $title = normalize($status_item->text);
-        $hash = (string) $status_item->id_str;
-        $link = 'https://twitter.com/' . $status_item->user->id . '/status/' . $hash;
-        $ts = strtotime($status_item->created_at);
+    if (count($statuses) >= 1) {
+        foreach ($statuses as $status_item) {
+            $type = 'twitter';
+            $title = normalize($status_item->text);
+            $hash = (string) $status_item->id_str;
+            $link = 'https://twitter.com/' . $status_item->user->id . '/status/' . $hash;
+            $ts = strtotime($status_item->created_at);
 
-        $sqlFindOne = "SELECT * FROM( SELECT * FROM main.DATAS WHERE SHAURL = '$shaUrl' ) WHERE ITEM_SHA = '$hash'";
+            $sqlFindOne = "SELECT * FROM( SELECT * FROM main.DATAS WHERE SHAURL = '$shaUrl' ) WHERE ITEM_SHA = '$hash'";
 
-        $findOne = $GLOBALS['db']->querySingle($sqlFindOne);
+            $findOne = $GLOBALS['db']->querySingle($sqlFindOne);
 
-        if (is_null($findOne)) {
-            $item = [];
-            $item['type'] = $type;
-            $item['title'] = $title;
-            $item['timestamp'] = $ts;
-            $item['link'] = $link;
-            $item['user'] = $status_item->user->screen_name;
-            $item['hash'] = $hash;
-            $item['mention'] = $status_item->entities->user_mentions;
+            if (is_null($findOne)) {
+                $item = [];
+                $item['type'] = $type;
+                $item['title'] = $title;
+                $item['timestamp'] = $ts;
+                $item['link'] = $link;
+                $item['user'] = $status_item->user->screen_name;
+                $item['hash'] = $hash;
+                $item['mention'] = $status_item->entities->user_mentions;
 
-            $sjItem = SQLite3::escapeString(serialize($item));
+                $sjItem = SQLite3::escapeString(serialize($item));
 
-            $sql = "INSERT INTO main.DATAS (TYPE, SHAURL, TITLE, LINK, TS ,JSON, ITEM_SHA) VALUES ('2','$shaUrl','$title','$link', '$ts', '$sjItem', '$hash')";
+                $sql = "INSERT INTO main.DATAS (TYPE, SHAURL, TITLE, LINK, TS ,JSON, ITEM_SHA) VALUES ('2','$shaUrl','$title','$link', '$ts', '$sjItem', '$hash')";
 
-            if ($GLOBALS['db']->exec($sql)) {
-                $twitter_to_db++;
+                if ($GLOBALS['db']->exec($sql)) {
+                    $twitter_to_db++;
+                } else {
+                    $twitter_error++;
+                }
             } else {
-                $twitter_error++;
+                $twitter_found++;
             }
-        } else {
-            $twitter_found++;
         }
+    } else {
+        $twitter_fetch_error = 1;
     }
 
-    $twitter_result = ['to_db' => $twitter_to_db, 'db_error' => $twitter_error, 'found' => $twitter_found];
+    $twitter_result = ['to_db' => $twitter_to_db, 'db_error' => $twitter_error, 'twitter_fetch_error' => $twitter_fetch_error, 'found' => $twitter_found];
 
     $endtime = microtime(true);
     $timediff = ($endtime - $starttime) * 100;
