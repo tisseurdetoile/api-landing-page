@@ -7,7 +7,10 @@
     <div class="post-list__meta">
       <TSDateDisplay v-bind:timestamp="post.timestamp" />
       &#8226;
-      <span v-if="post.mention" class="post-meta__tags">
+      <span
+        v-if="post.mention && post.mention.length > 0"
+        class="post-meta__tags"
+      >
         via
         <span v-for="mention in post.mention" :key="mention.id">
           <a v-bind:href="'http://www.twitter.com/' + mention.screen_name">
